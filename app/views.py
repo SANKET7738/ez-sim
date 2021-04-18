@@ -35,9 +35,8 @@ def index():
                 color='blue',
                 linestyle='-',
                 )
-    print(0)
+    
     plt.tight_layout()
-    print(1)
     print(plt)
     plt.show(block=True)
     buf = BytesIO()
