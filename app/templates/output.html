@@ -3,6 +3,17 @@
 <div class="text-center">
     <h1>{{ args.title }}</h1>
     <img src={{ args.imgUrl }} class="rounded m-2">
+    {% if image %}
+        <img class="img-thumbnail w-50" src='data:image/png;base64,{{data}}' /> 
+    {% endif %} 
+    {% if args.output %} 
+        {% for key, value in args.output.items() %}
+            <div class="m-2">
+                <h2> Node {{key}} : {{value}}</h2>
+            </div>
+        {% endfor %} 
+    {% endif %}
+      
 
 </div>
 {% endblock %}

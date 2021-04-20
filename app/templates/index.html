@@ -46,17 +46,6 @@
             </div>
         </nav>
         {% block circuit %}{% endblock %}
-        <div class="text-center">
-            <h1>{{args.title}}</h1>
-            {% if image %}
-                <img class="img-thumbnail w-50" src='data:image/png;base64,{{data}}' /> 
-            {% endif %} 
-            {% if args.output %} 
-                {% for key, value in args.output.items() %}
-                    <h1> Node {{key}} : {{value}}</h1>
-                {% endfor %} 
-            {% endif %}
-        </div> 
     </div>
 
 

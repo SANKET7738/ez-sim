@@ -3,16 +3,18 @@
 <div class="text-center">
     <h1>{{ args.title }}</h1>
     <img src={{ args.imgUrl }} class="rounded m-2">
-    <form class="" action="" method="POST">
+    <form class="" action="{{ url_for('output')}}"" method="POST">
         <div class="row g-3 w-25 mx-auto my-5">
+             <input type="hidden" name="title" value={{args.title}}>
+              <input type="hidden" name="imgUrl" value={{args.imgUrl}}>
             <div class="col-sm">
-                <input type="text" class="form-control" placeholder="Vin" aria-label="Vin">
+                <input type="text" class="form-control" name="Vin" placeholder="Vin" aria-label="Vin">
             </div>
             <div class="col-sm">
-                <input type="text" class="form-control" placeholder="R 1" aria-label="R 1">
+                <input type="text" class="form-control" name="R1" placeholder="R 1" aria-label="R 1">
             </div>
             <div class="col-sm">
-                <input type="text" class="form-control" placeholder="R 2" aria-label="R 2">
+                <input type="text" class="form-control" name="R2" placeholder="R 2" aria-label="R 2">
             </div>
         </div>
         <button type="submit" class="btn btn-primary my-2">Submit</button>

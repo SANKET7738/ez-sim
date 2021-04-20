@@ -46,17 +46,32 @@ def operational_amplifier():
     
     return circuit, analysis, plt
 
-def voltage_divider():
+def voltage_divider(v,r1,r2):
     circuit = Circuit('Voltage Divider')
-    circuit.V('input', 1, circuit.gnd, 10@u_V)
-    circuit.R(1, 1, 2, 2@u_kΩ)
-    circuit.R(2, 2, circuit.gnd, 1@u_kΩ)
-
+    circuit.V('input', 1, circuit.gnd, u_V(float(v)))
+    circuit.R(1, 1, 2, u_kOhm(float(r1)))
+    circuit.R(2, 2, circuit.gnd, u_kOhm(float(r2)))
     simulator = circuit.simulator(temperature=25, nominal_temperature=25)
     analysis = simulator.operating_point()
     output = {}
     for node in analysis.nodes.values():
-        output[str(node)] = str(round(float(node),2)) + "V"
-    print(output)    
+        output[str(node)] = str(round(float(node),2)) + "V"  
+
+    return circuit, analysis, output
+
+def current_divider(i,r1,r2):
+    circuit = Circuit('Current Divider')
+    circuit.I('input', 1, circuit.gnd, u_A(float(i))) # Fixme: current value
+    circuit.R(1, 1, circuit.gnd, u_kOhm(float(r1)))
+    circuit.R(2, 1, circuit.gnd, u_kOhm(float(r2)))
+
+    for resistance in (circuit.R1, circuit.R2):
+        resistance.minus.add_current_probe(circuit) # to get positive value
+
+    simulator = circuit.simulator(temperature=25, nominal_temperature=25)
+    analysis = simulator.operating_point()
+    output = {}
+    for node in analysis.branches.values():
+        output[str(node)] = str(round(float(node),2)) + "A" 
 
     return circuit, analysis, output
