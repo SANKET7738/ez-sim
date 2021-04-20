@@ -32,22 +32,31 @@
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Dropdown link
+                                Choose Circuit
                             </a>
-                            <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                                <li><a class="dropdown-item" href="#">Action</a></li>
-                                <li><a class="dropdown-item" href="#">Another action</a></li>
-                                <li><a class="dropdown-item" href="#">Something else here</a></li>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                {% for key,value in args.list.items() %}
+                                    <li><a class="dropdown-item" href="{{ url_for('index', item=value) }}">{{ value }}</a></li>
+                                {% endfor %}
+                                
                             </ul>
                         </li>
                     </ul>
                 </div>
             </div>
         </nav>
+        {% block circuit %}{% endblock %}
         <div class="text-center">
-            <h1>{{title}}</h1>
-            <img class="img-thumbnail w-50" src='data:image/png;base64,{{data}}' />
-        </div>
+            <h1>{{args.title}}</h1>
+            {% if image %}
+                <img class="img-thumbnail w-50" src='data:image/png;base64,{{data}}' /> 
+            {% endif %} 
+            {% if args.output %} 
+                {% for key, value in args.output.items() %}
+                    <h1> Node {{key}} : {{value}}</h1>
+                {% endfor %} 
+            {% endif %}
+        </div> 
     </div>
 
 

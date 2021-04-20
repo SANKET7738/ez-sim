@@ -56,6 +56,7 @@ def voltage_divider():
     analysis = simulator.operating_point()
     output = {}
     for node in analysis.nodes.values():
-        print('Node {}: {:5.2f} V'.format(str(node), float(node))
-        output['Node {}'.format(str(node))] = {':5.2f'}.format(float(node))
-    print(output)     
+        output[str(node)] = str(round(float(node),2)) + "V"
+    print(output)    
+
+    return circuit, analysis, output
