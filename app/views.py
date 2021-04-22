@@ -3,7 +3,7 @@ from flask import render_template, request, redirect, jsonify
 import numpy as np
 import base64
 from io import BytesIO
-from circuit import operational_amplifier, voltage_divider, current_divider, diode_characteristic_curve, half_wave_rectifier, full_wave_rectifier
+from circuit import operational_amplifier, voltage_divider, current_divider, diode_characteristic_curve, half_wave_rectifier, full_wave_rectifier, low_pass_rc_filter, high_pass_rc_filter
 
 circuitList = { 
         "1": "Voltage-Divider",
@@ -11,6 +11,8 @@ circuitList = {
         "3": "Diode-Characteristic-Curve",
         "4": "Half-Wave-Rectifier",
         "5": "Full-Wave-Rectifier",
+        "6": "Low-Pass-RC-Filter",
+        "7": "High-Pass-RC-Filter"
     }
 circuitImgList = {
     "1": "https://pyspice.fabrice-salvaire.fr/releases/v1.4/_images/voltage-divider.png",
@@ -18,6 +20,8 @@ circuitImgList = {
     "3": "https://pyspice.fabrice-salvaire.fr/releases/v1.4/_images/diode-characteristic-curve-circuit.png",
     "4": "https://pyspice.fabrice-salvaire.fr/releases/v1.4/_images/half-wave-rectification.png",
     "5": "https://pyspice.fabrice-salvaire.fr/releases/v1.4/_images/full-wave-rectification.png",
+    "6": "https://pyspice.fabrice-salvaire.fr/releases/v1.4/_images/low-pass-rc-filter.png",
+    "7": "https://www.electronics-tutorials.ws/wp-content/uploads/2013/08/fil11.gif?fit=326%2C165",
 }
 
 
@@ -87,8 +91,31 @@ def index():
             msg = "Units: Vin = V ,  R = Ohm , C = mF , F = Hz, Diode = '1N4148' "
             args['msg'] = msg
             return render_template("circuit.html", args=args)
+        
+        if item == "Low-Pass-RC-Filter":
+            args = {}
+            args['list'] = circuitList
+            imgUrl = circuitImgList.get("6")
+            args['title'] = item
+            args['imgUrl'] = imgUrl
+            inputs = ['Vin', 'R' , 'C']
+            args['inputs'] = inputs
+            msg = "Units: Vin = V ,  R = kOhm , C = uF "
+            args['msg'] = msg
+            return render_template("circuit.html", args=args)
 
-  
+        if item == "High-Pass-RC-Filter":
+            args = {}
+            args['list'] = circuitList
+            imgUrl = circuitImgList.get("7")
+            args['title'] = item
+            args['imgUrl'] = imgUrl
+            inputs = ['Vin', 'R' , 'C']
+            args['inputs'] = inputs
+            msg = "Units: Vin = V ,  R = kOhm , C = uF "
+            args['msg'] = msg
+            return render_template("circuit.html", args=args)
+        
     return render_template("index.html", args=args)
 
 @app.route("/output", methods=["GET", "POST"])
@@ -158,6 +185,34 @@ def output():
         data = base64.b64encode(buf.getbuffer()).decode("ascii")
         args['plot'] = data
         inputs = str('Inputs: Vin = {} V , R = {} Ohm , C = {} mF, F = {} Hz'.format(formData['Vin'], formData['R'], formData['C'],formData['F']))
+        args['inputs'] = inputs
+        return render_template("output.html", args=args)
+    
+    if formData['title'] == "Low-Pass-RC-Filter":
+        args = {}
+        args['list'] = circuitList
+        args['imgUrl'] = formData['imgUrl']
+        circuit, analysis, plot = low_pass_rc_filter(formData['Vin'], formData['R'], formData['C'])
+        args['title'] = circuit.title
+        buf = BytesIO()
+        plot.savefig(buf, format="png")
+        data = base64.b64encode(buf.getbuffer()).decode("ascii")
+        args['plot'] = data
+        inputs = str('Inputs: Vin = {} V , R = {} kOhm , C = {} mF'.format(formData['Vin'], formData['R'], formData['C']))
+        args['inputs'] = inputs
+        return render_template("output.html", args=args)
+    
+    if formData['title'] == "High-Pass-RC-Filter":
+        args = {}
+        args['list'] = circuitList
+        args['imgUrl'] = formData['imgUrl']
+        circuit, analysis, plot = high_pass_rc_filter(formData['Vin'], formData['R'], formData['C'])
+        args['title'] = circuit.title
+        buf = BytesIO()
+        plot.savefig(buf, format="png")
+        data = base64.b64encode(buf.getbuffer()).decode("ascii")
+        args['plot'] = data
+        inputs = str('Inputs: Vin = {} V , R = {} kOhm , C = {} mF'.format(formData['Vin'], formData['R'], formData['C']))
         args['inputs'] = inputs
         return render_template("output.html", args=args)
 

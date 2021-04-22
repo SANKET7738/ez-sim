@@ -1,5 +1,6 @@
 from app.circuits.OpAmps.OperationalAmplifier import BasicOperationalAmplifier
 import numpy as np
+import math
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import PySpice.Logging.Logging as Logging
@@ -233,3 +234,63 @@ def full_wave_rectifier(v,r,c,f):
     plt.tight_layout()
 
     return circuit, analysis, plt
+
+    
+def low_pass_rc_filter(v,r,c):
+    circuit = Circuit('Low-Pass RC Filter')
+    circuit.SinusoidalVoltageSource('input', 'in', circuit.gnd, amplitude=u_V(float(v)))
+    R1 = circuit.R(1, 'in', 'out', u_kΩ(float(r)))
+    C1 = circuit.C(1, 'out', circuit.gnd, u_uF(float(c)))
+    # C1 = circuit.C(1, 'in', 'out', u_uF(float(c)))
+    # R1 = circuit.R(1, 'out', circuit.gnd, u_kΩ(float(r)))
+    break_frequency = 1 / (2 * math.pi * float(R1.resistance * C1.capacitance))
+    print("Break frequency = {:.1f} Hz".format(break_frequency))
+    simulator = circuit.simulator(temperature=25, nominal_temperature=25)
+    analysis = simulator.ac(start_frequency=1@u_Hz, stop_frequency=1@u_MHz, number_of_points=10,  variation='dec')
+    # print(analysis.out)
+    figure, axes = plt.subplots(2, figsize=(20, 10))
+    plt.title("Bode Diagram of a Low-Pass RC Filter")
+    bode_diagram(axes=axes,
+                frequency=analysis.frequency,
+                gain=20*np.log10(np.absolute(analysis.out)),
+                phase=np.angle(analysis.out, deg=False),
+                marker='.',
+                color='blue',
+                linestyle='-',
+    )
+    for ax in axes:
+        ax.axvline(x=break_frequency, color='red')
+
+    plt.tight_layout()
+    
+    return circuit, analysis, plt
+
+
+def high_pass_rc_filter(v,r,c):
+    circuit = Circuit('Low-Pass RC Filter')
+    circuit.SinusoidalVoltageSource('input', 'in', circuit.gnd, amplitude=u_V(float(v)))
+    C1 = circuit.C(1, 'in', 'out', u_uF(float(c)))
+    R1 = circuit.R(1, 'out', circuit.gnd, u_kΩ(float(r)))
+    break_frequency = 1 / (2 * math.pi * float(R1.resistance * C1.capacitance))
+    print("Break frequency = {:.1f} Hz".format(break_frequency))
+    simulator = circuit.simulator(temperature=25, nominal_temperature=25)
+    analysis = simulator.ac(start_frequency=1@u_Hz, stop_frequency=1@u_MHz, number_of_points=10,  variation='dec')
+    # print(analysis.out)
+    figure, axes = plt.subplots(2, figsize=(20, 10))
+    plt.title("Bode Diagram of a Low-Pass RC Filter")
+    bode_diagram(axes=axes,
+                frequency=analysis.frequency,
+                gain=20*np.log10(np.absolute(analysis.out)),
+                phase=np.angle(analysis.out, deg=False),
+                marker='.',
+                color='blue',
+                linestyle='-',
+    )
+    for ax in axes:
+        ax.axvline(x=break_frequency, color='red')
+
+    plt.tight_layout()
+    
+    return circuit, analysis, plt
+
+
