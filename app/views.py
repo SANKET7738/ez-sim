@@ -15,16 +15,35 @@ circuitList = {
         "7": "High-Pass-RC-Filter"
     }
 circuitImgList = {
-    "1": "https://pyspice.fabrice-salvaire.fr/releases/v1.4/_images/voltage-divider.png",
-    "2": "https://pyspice.fabrice-salvaire.fr/releases/v1.4/_images/current-divider.png",
-    "3": "https://pyspice.fabrice-salvaire.fr/releases/v1.4/_images/diode-characteristic-curve-circuit.png",
-    "4": "https://pyspice.fabrice-salvaire.fr/releases/v1.4/_images/half-wave-rectification.png",
-    "5": "https://pyspice.fabrice-salvaire.fr/releases/v1.4/_images/full-wave-rectification.png",
-    "6": "https://pyspice.fabrice-salvaire.fr/releases/v1.4/_images/low-pass-rc-filter.png",
-    "7": "https://www.electronics-tutorials.ws/wp-content/uploads/2013/08/fil11.gif?fit=326%2C165",
+    "Voltage-Divider": "https://pyspice.fabrice-salvaire.fr/releases/v1.4/_images/voltage-divider.png",
+    "Current-Divider": "https://pyspice.fabrice-salvaire.fr/releases/v1.4/_images/current-divider.png",
+    "Diode-Characteristic-Curve": "https://pyspice.fabrice-salvaire.fr/releases/v1.4/_images/diode-characteristic-curve-circuit.png",
+    "Half-Wave-Rectifier": "https://pyspice.fabrice-salvaire.fr/releases/v1.4/_images/half-wave-rectification.png",
+    "Full-Wave-Rectifier": "https://pyspice.fabrice-salvaire.fr/releases/v1.4/_images/full-wave-rectification.png",
+    "Low-Pass-RC-Filter": "https://pyspice.fabrice-salvaire.fr/releases/v1.4/_images/low-pass-rc-filter.png",
+    "High-Pass-RC-Filter": "https://www.electronics-tutorials.ws/wp-content/uploads/2013/08/fil11.gif?fit=326%2C165",
 }
 
+inputList = {
+    "Voltage-Divider" : [['Vin', 'R1', 'R2'], "Units: Vin = V , R1 & R2 = kOhm" ],
+    "Current-Divider" : [['Iin', 'R1', 'R2'], "Units: Iin = A ,  R1 & R2 = kOhm" ],
+    "Diode-Characteristic-Curve" : [['Vin', 'R'], "Units: Vin = V ,  R = Ohm , Diode = '1N4148' "],
+    "Half-Wave-Rectifier" : [['Vin', 'R' , 'C', 'F'], "Units: Vin = V ,  R = Ohm , C = mF , F = Hz, Diode = '1N4148' " ],
+    "Full-Wave-Rectifier" : [['Vin', 'R' , 'C', 'F'], "Units: Vin = V ,  R = Ohm , C = mF , F = Hz, Diode = '1N4148' " ],
+    "Low-Pass-RC-Filter" : [['Vin', 'R' , 'C'], "Units: Vin = V ,  R = kOhm , C = uF "],
+    "High-Pass-RC-Filter" : [['Vin', 'R' , 'C'], "Units: Vin = V ,  R = kOhm , C = uF " ],
+}
 
+def renderInput(item):
+    args = {}
+    args['list'] = circuitList
+    args['title'] = item
+    imgUrl = circuitImgList.get(item)
+    args['imgUrl'] = imgUrl
+    inputs = inputList.get(item)
+    args['inputs'] = inputs[0]
+    args['msg'] = inputs[1]
+    return args
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -33,89 +52,9 @@ def index():
     if request.args:
         raw_req = request.args
         item = raw_req['item']
-        if item == "Voltage-Divider":
-            args = {}
-            args['list'] = circuitList
-            imgUrl = circuitImgList.get("1")
-            args['title'] = item
-            args['imgUrl'] = imgUrl
-            inputs = ['Vin', 'R1', 'R2']
-            args['inputs'] = inputs
-            msg = "Units: Vin = V , R1 & R2 = kOhm"
-            args['msg'] = msg
-            return render_template("circuit.html", args=args)
+        args = renderInput(item)
+        return render_template("circuit.html", args=args)
 
-        if item == "Current-Divider":
-            args = {}
-            args['list'] = circuitList
-            imgUrl = circuitImgList.get("2")
-            args['title'] = item
-            args['imgUrl'] = imgUrl
-            inputs = ['Iin', 'R1', 'R2']
-            args['inputs'] = inputs
-            msg = "Units: Iin = A ,  R1 & R2 = kOhm"
-            args['msg'] = msg
-            return render_template("circuit.html", args=args)
-            
-        if item == "Diode-Characteristic-Curve":
-            args = {}
-            args['list'] = circuitList
-            imgUrl = circuitImgList.get("3")
-            args['title'] = item
-            args['imgUrl'] = imgUrl
-            args['inputs'] = ['Vin', 'R']
-            msg = "Units: Vin = V ,  R = Ohm , Diode = '1N4148' "
-            args['msg'] = msg
-            return render_template("circuit.html", args=args)
-        
-        if item == "Half-Wave-Rectifier":
-            args = {}
-            args['list'] = circuitList
-            imgUrl = circuitImgList.get("4")
-            args['title'] = item
-            args['imgUrl'] = imgUrl
-            inputs = ['Vin', 'R' , 'C', 'F']
-            args['inputs'] = inputs
-            msg = "Units: Vin = V ,  R = Ohm , C = mF , F = Hz, Diode = '1N4148' "
-            args['msg'] = msg
-            return render_template("circuit.html", args=args)
-        
-        if item == "Full-Wave-Rectifier":
-            args = {}
-            args['list'] = circuitList
-            imgUrl = circuitImgList.get("5")
-            args['title'] = item
-            args['imgUrl'] = imgUrl
-            inputs = ['Vin', 'R' , 'C', 'F']
-            args['inputs'] = inputs
-            msg = "Units: Vin = V ,  R = Ohm , C = mF , F = Hz, Diode = '1N4148' "
-            args['msg'] = msg
-            return render_template("circuit.html", args=args)
-        
-        if item == "Low-Pass-RC-Filter":
-            args = {}
-            args['list'] = circuitList
-            imgUrl = circuitImgList.get("6")
-            args['title'] = item
-            args['imgUrl'] = imgUrl
-            inputs = ['Vin', 'R' , 'C']
-            args['inputs'] = inputs
-            msg = "Units: Vin = V ,  R = kOhm , C = uF "
-            args['msg'] = msg
-            return render_template("circuit.html", args=args)
-
-        if item == "High-Pass-RC-Filter":
-            args = {}
-            args['list'] = circuitList
-            imgUrl = circuitImgList.get("7")
-            args['title'] = item
-            args['imgUrl'] = imgUrl
-            inputs = ['Vin', 'R' , 'C']
-            args['inputs'] = inputs
-            msg = "Units: Vin = V ,  R = kOhm , C = uF "
-            args['msg'] = msg
-            return render_template("circuit.html", args=args)
-        
     return render_template("index.html", args=args)
 
 @app.route("/output", methods=["GET", "POST"])

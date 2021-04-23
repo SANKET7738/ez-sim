@@ -1,8 +1,8 @@
-{% extends 'index.html' %}
+{% extends 'base.html' %}
 {% block circuit %}
 <div class="text-center">
     <h1>{{ args.title }}</h1>
-    <img src={{ args.imgUrl }} class="rounded m-2">
+    <img class="img-fluid" src={{ args.imgUrl }} class="rounded m-2">
     {% if args.inputs %}
         <h4 class="m-2">{{ args.inputs }}</h4>
     {% endif %} 

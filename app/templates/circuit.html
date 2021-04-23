@@ -1,8 +1,8 @@
-{% extends 'index.html' %}
+{% extends 'base.html' %}
 {% block circuit %}
 <div class="text-center">
     <h1>{{ args.title }}</h1>
-    <img src={{ args.imgUrl }} class="rounded m-2">
+    <img class="img-fluid" src={{ args.imgUrl }} class="rounded m-2">
     <h4 class="m-2">{{ args.msg }}</h4>
     <form class="" action="{{ url_for('output')}}"" method="POST">
         <div class="row g-3 w-25 mx-auto my-3">
