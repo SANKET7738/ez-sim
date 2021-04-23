@@ -12,3 +12,7 @@ body {
 .display-1 {
     font-family: 'DotGothic16', sans-serif;
 }
+
+::-webkit-scrollbar {
+    display: none;
+}

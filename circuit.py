@@ -38,8 +38,9 @@ def operational_amplifier():
 
     simulator = circuit.simulator(temperature=25, nominal_temperature=25)
     analysis = simulator.ac(start_frequency=1@u_Hz, stop_frequency=100@u_MHz, number_of_points=5,  variation='dec')
-
+    plt.close('all')
     figure, (ax1, ax2) = plt.subplots(2, figsize=(20, 10))
+
 
     plt.title("Bode Diagram of an Operational Amplifier")
     bode_diagram(axes=(ax1, ax2),
@@ -107,6 +108,8 @@ def diode_characteristic_curve(v,r):
             return '{} nA'.format(value/100)
     formatter = ticker.FuncFormatter(two_scales_tick_formatter)
 
+    plt.close('all')
+
     figure, (ax1, ax2) = plt.subplots(2, figsize=(20, 10))
     ax1.set_title('1N4148 Characteristic Curve ')
     ax1.set_xlabel('Voltage [V]')
@@ -166,6 +169,7 @@ def half_wave_rectifier(v,r,c,f):
 
     simulator = circuit.simulator(temperature=25, nominal_temperature=25)
     analysis = simulator.transient(step_time=source.period/200, end_time=source.period*2)
+    plt.close('all')
     figure, (ax1, ax2) = plt.subplots(2, figsize=(20, 10))
 
     ax1.set_title('Half-Wave Rectification')
@@ -206,6 +210,7 @@ def full_wave_rectifier(v,r,c,f):
 
     simulator = circuit.simulator(temperature=25, nominal_temperature=25)
     analysis = simulator.transient(step_time=source.period/200, end_time=source.period*2)
+    plt.close('all')
     figure, (ax3, ax4) = plt.subplots(2, figsize=(20, 10))
 
     ax3.set_title('Full-Wave Rectification')
@@ -248,6 +253,7 @@ def low_pass_rc_filter(v,r,c):
     simulator = circuit.simulator(temperature=25, nominal_temperature=25)
     analysis = simulator.ac(start_frequency=1@u_Hz, stop_frequency=1@u_MHz, number_of_points=10,  variation='dec')
     # print(analysis.out)
+    plt.close('all')
     figure, axes = plt.subplots(2, figsize=(20, 10))
     plt.title("Bode Diagram of a Low-Pass RC Filter")
     bode_diagram(axes=axes,
@@ -276,6 +282,7 @@ def high_pass_rc_filter(v,r,c):
     simulator = circuit.simulator(temperature=25, nominal_temperature=25)
     analysis = simulator.ac(start_frequency=1@u_Hz, stop_frequency=1@u_MHz, number_of_points=10,  variation='dec')
     # print(analysis.out)
+    plt.close('all')
     figure, axes = plt.subplots(2, figsize=(20, 10))
     plt.title("Bode Diagram of a Low-Pass RC Filter")
     bode_diagram(axes=axes,
@@ -302,7 +309,7 @@ def series_negative_clipper(v,r,f):
 
     simulator = circuit.simulator(temperature=25, nominal_temperature=25)
     analysis = simulator.transient(step_time=source.period/200, end_time=source.period*2)
-
+    plt.close('all')
     plt.title('Series Negative Clipper')
     plt.xlabel('Time [s]')
     plt.ylabel('Voltage [V]')
@@ -326,7 +333,7 @@ def series_positive_clipper(v,r,f):
 
     simulator = circuit.simulator(temperature=25, nominal_temperature=25)
     analysis = simulator.transient(step_time=source.period/200, end_time=source.period*2)
-
+    plt.close('all')
     plt.title('Series Positve Clipper')
     plt.xlabel('Time [s]')
     plt.ylabel('Voltage [V]')
@@ -352,7 +359,7 @@ def positive_clamper(v,r,c,f):
 
     simulator = circuit.simulator(temperature=25, nominal_temperature=25)
     analysis = simulator.transient(step_time=source.period/200, end_time=source.period*2)
-
+    plt.close('all')
     plt.title('Positive Clamper')
     plt.xlabel('Time [s]')
     plt.ylabel('Voltage [V]')
@@ -376,7 +383,7 @@ def negative_clamper(v,r,c,f):
 
     simulator = circuit.simulator(temperature=25, nominal_temperature=25)
     analysis = simulator.transient(step_time=source.period/200, end_time=source.period*2)
-
+    plt.close('all')
     plt.title('Negative Clamper')
     plt.xlabel('Time [s]')
     plt.ylabel('Voltage [V]')
