@@ -293,4 +293,50 @@ def high_pass_rc_filter(v,r,c):
     
     return circuit, analysis, plt
 
+def series_negative_clipper(v,r,f):
+    circuit = Circuit('Series Negative Clipper')
+    circuit.include('./app/circuits/libraries/diode/switching/1N4148.lib')
+    source = circuit.SinusoidalVoltageSource('input', 'in', circuit.gnd, amplitude=u_V(float(v)), frequency=u_Hz(float(f)))
+    circuit.X('D1', '1N4148', 'in', 'output')
+    circuit.R('load', 'output', circuit.gnd,u_Ω(float(r)))
+
+    simulator = circuit.simulator(temperature=25, nominal_temperature=25)
+    analysis = simulator.transient(step_time=source.period/200, end_time=source.period*2)
+
+    plt.title('Series Negative Clipper')
+    plt.xlabel('Time [s]')
+    plt.ylabel('Voltage [V]')
+    plt.grid()
+    plt.plot(analysis['in'])
+    plt.plot(analysis.output)
+    plt.legend(('input', 'output'), loc=(.05,.1))
+    plt.ylim(float(-source.amplitude*1.1), float(source.amplitude*1.1))
+
+    plt.tight_layout()
+
+    return circuit, analysis, plt
+
+
+def series_positive_clipper(v,r,f):
+    circuit = Circuit('Series Negative Clipper')
+    circuit.include('./app/circuits/libraries/diode/switching/1N4148.lib')
+    source = circuit.SinusoidalVoltageSource('input', 'in', circuit.gnd, amplitude=u_V(float(v)), frequency=u_Hz(float(f)))
+    circuit.X('D1', '1N4148', 'output', 'in')
+    circuit.R('load', 'output', circuit.gnd,u_Ω(float(r)))
+
+    simulator = circuit.simulator(temperature=25, nominal_temperature=25)
+    analysis = simulator.transient(step_time=source.period/200, end_time=source.period*2)
+
+    plt.title('Series Positve Clipper')
+    plt.xlabel('Time [s]')
+    plt.ylabel('Voltage [V]')
+    plt.grid()
+    plt.plot(analysis['in'])
+    plt.plot(analysis.output)
+    plt.legend(('input', 'output'), loc=(.05,.1))
+    plt.ylim(float(-source.amplitude*1.1), float(source.amplitude*1.1))
+
+    plt.tight_layout()
+
+    return circuit, analysis, plt
 

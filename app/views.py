@@ -3,7 +3,7 @@ from flask import render_template, request, redirect, jsonify
 import numpy as np
 import base64
 from io import BytesIO
-from circuit import operational_amplifier, voltage_divider, current_divider, diode_characteristic_curve, half_wave_rectifier, full_wave_rectifier, low_pass_rc_filter, high_pass_rc_filter
+from circuit import operational_amplifier, voltage_divider, current_divider, diode_characteristic_curve, half_wave_rectifier, full_wave_rectifier, low_pass_rc_filter, high_pass_rc_filter, series_negative_clipper, series_positive_clipper
 
 circuitList = { 
         "1": "Voltage-Divider",
@@ -12,7 +12,9 @@ circuitList = {
         "4": "Half-Wave-Rectifier",
         "5": "Full-Wave-Rectifier",
         "6": "Low-Pass-RC-Filter",
-        "7": "High-Pass-RC-Filter"
+        "7": "High-Pass-RC-Filter",
+        "8" : "Series-Negative-Clipper",
+        "9" : "Series-Positive-Clipper",
     }
 circuitImgList = {
     "Voltage-Divider": "https://pyspice.fabrice-salvaire.fr/releases/v1.4/_images/voltage-divider.png",
@@ -22,6 +24,8 @@ circuitImgList = {
     "Full-Wave-Rectifier": "https://pyspice.fabrice-salvaire.fr/releases/v1.4/_images/full-wave-rectification.png",
     "Low-Pass-RC-Filter": "https://pyspice.fabrice-salvaire.fr/releases/v1.4/_images/low-pass-rc-filter.png",
     "High-Pass-RC-Filter": "https://www.electronics-tutorials.ws/wp-content/uploads/2013/08/fil11.gif?fit=326%2C165",
+    "Series-Negative-Clipper": "https://www.daenotes.com/sites/default/files/article-images/series-negative-clipper.GIF",
+    "Series-Positive-Clipper" : "https://www.daenotes.com/sites/default/files/article-images/series-positive-clipper.GIF",
 }
 
 inputList = {
@@ -32,6 +36,8 @@ inputList = {
     "Full-Wave-Rectifier" : [['Vin', 'R' , 'C', 'F'], "Units: Vin = V ,  R = Ohm , C = mF , F = Hz, Diode = '1N4148' " ],
     "Low-Pass-RC-Filter" : [['Vin', 'R' , 'C'], "Units: Vin = V ,  R = kOhm , C = uF "],
     "High-Pass-RC-Filter" : [['Vin', 'R' , 'C'], "Units: Vin = V ,  R = kOhm , C = uF " ],
+    "Series-Negative-Clipper": [['Vin', 'R', 'F'], "Units: Vin = V , R = Ohm , F = Hz, Diode = '1N4148' "],
+    "Series-Positive-Clipper": [['Vin', 'R', 'F'], "Units: Vin = V , R = Ohm , F = Hz, Diode = '1N4148' "],
 }
 
 def renderInput(item):
@@ -104,6 +110,9 @@ def output():
         args['list'] = circuitList
         args['imgUrl'] = formData['imgUrl']
         circuit, analysis, plot = half_wave_rectifier(formData['Vin'], formData['R'], formData['C'], formData['F'])
+        print(circuit)
+        print(analysis)
+        print(plot)
         args['title'] = circuit.title
         buf = BytesIO()
         plot.savefig(buf, format="png")
@@ -152,6 +161,36 @@ def output():
         data = base64.b64encode(buf.getbuffer()).decode("ascii")
         args['plot'] = data
         inputs = str('Inputs: Vin = {} V , R = {} kOhm , C = {} mF'.format(formData['Vin'], formData['R'], formData['C']))
+        args['inputs'] = inputs
+        return render_template("output.html", args=args)
+
+    if formData['title'] == "Series-Negative-Clipper":
+        print("1")
+        args = {}
+        args['list'] = circuitList
+        args['imgUrl'] = formData['imgUrl']
+        circuit, analysis, plot = series_negative_clipper(formData['Vin'], formData['R'], formData['F'])
+        args['title'] = circuit.title
+        buf = BytesIO()
+        plot.savefig(buf, format="png")
+        data = base64.b64encode(buf.getbuffer()).decode("ascii")
+        args['plot'] = data
+        inputs = str('Inputs: Vin = {} V , R = {} kOhm , C = {} mF'.format(formData['Vin'], formData['R'], formData['F']))
+        args['inputs'] = inputs
+        return render_template("output.html", args=args)
+    
+    if formData['title'] == "Series-Positive-Clipper":
+        print("1")
+        args = {}
+        args['list'] = circuitList
+        args['imgUrl'] = formData['imgUrl']
+        circuit, analysis, plot = series_positive_clipper(formData['Vin'], formData['R'], formData['F'])
+        args['title'] = circuit.title
+        buf = BytesIO()
+        plot.savefig(buf, format="png")
+        data = base64.b64encode(buf.getbuffer()).decode("ascii")
+        args['plot'] = data
+        inputs = str('Inputs: Vin = {} V , R = {} kOhm , C = {} mF'.format(formData['Vin'], formData['R'], formData['F']))
         args['inputs'] = inputs
         return render_template("output.html", args=args)
 
