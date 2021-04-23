@@ -3,7 +3,7 @@ from flask import render_template, request, redirect, jsonify
 import numpy as np
 import base64
 from io import BytesIO
-from circuit import operational_amplifier, voltage_divider, current_divider, diode_characteristic_curve, half_wave_rectifier, full_wave_rectifier, low_pass_rc_filter, high_pass_rc_filter, series_negative_clipper, series_positive_clipper
+from circuit import operational_amplifier, voltage_divider, current_divider, diode_characteristic_curve, half_wave_rectifier, full_wave_rectifier, low_pass_rc_filter, high_pass_rc_filter, series_negative_clipper, series_positive_clipper, positive_clamper, negative_clamper
 
 circuitList = { 
         "1": "Voltage-Divider",
@@ -15,6 +15,8 @@ circuitList = {
         "7": "High-Pass-RC-Filter",
         "8" : "Series-Negative-Clipper",
         "9" : "Series-Positive-Clipper",
+        "10" : "Positive-Clamper",
+        "11" : "Negative-Clamper",
     }
 circuitImgList = {
     "Voltage-Divider": "https://pyspice.fabrice-salvaire.fr/releases/v1.4/_images/voltage-divider.png",
@@ -26,6 +28,8 @@ circuitImgList = {
     "High-Pass-RC-Filter": "https://www.electronics-tutorials.ws/wp-content/uploads/2013/08/fil11.gif?fit=326%2C165",
     "Series-Negative-Clipper": "https://www.daenotes.com/sites/default/files/article-images/series-negative-clipper.GIF",
     "Series-Positive-Clipper" : "https://www.daenotes.com/sites/default/files/article-images/series-positive-clipper.GIF",
+    "Positive-Clamper" : "https://www.tutorialspoint.com/electronic_circuits/images/positive_clamper_circuit.jpg",
+    "Negative-Clamper" : "https://www.tutorialspoint.com/electronic_circuits/images/negative_clamper_circuit.jpg",
 }
 
 inputList = {
@@ -38,6 +42,8 @@ inputList = {
     "High-Pass-RC-Filter" : [['Vin', 'R' , 'C'], "Units: Vin = V ,  R = kOhm , C = uF " ],
     "Series-Negative-Clipper": [['Vin', 'R', 'F'], "Units: Vin = V , R = Ohm , F = Hz, Diode = '1N4148' "],
     "Series-Positive-Clipper": [['Vin', 'R', 'F'], "Units: Vin = V , R = Ohm , F = Hz, Diode = '1N4148' "],
+    "Positive-Clamper" :  [['Vin', 'R' , 'C', 'F'], "Units: Vin = V ,  R = Ohm , C = mF , F = Hz, Diode = '1N4148' " ],
+    "Negative-Clamper" :  [['Vin', 'R' , 'C', 'F'], "Units: Vin = V ,  R = Ohm , C = mF , F = Hz, Diode = '1N4148' " ],
 }
 
 def renderInput(item):
@@ -175,12 +181,11 @@ def output():
         plot.savefig(buf, format="png")
         data = base64.b64encode(buf.getbuffer()).decode("ascii")
         args['plot'] = data
-        inputs = str('Inputs: Vin = {} V , R = {} kOhm , C = {} mF'.format(formData['Vin'], formData['R'], formData['F']))
+        inputs = str('Inputs: Vin = {} V , R = {} kOhm , f = {} Hz'.format(formData['Vin'], formData['R'], formData['F']))
         args['inputs'] = inputs
         return render_template("output.html", args=args)
     
     if formData['title'] == "Series-Positive-Clipper":
-        print("1")
         args = {}
         args['list'] = circuitList
         args['imgUrl'] = formData['imgUrl']
@@ -190,10 +195,37 @@ def output():
         plot.savefig(buf, format="png")
         data = base64.b64encode(buf.getbuffer()).decode("ascii")
         args['plot'] = data
-        inputs = str('Inputs: Vin = {} V , R = {} kOhm , C = {} mF'.format(formData['Vin'], formData['R'], formData['F']))
+        inputs = str('Inputs: Vin = {} V , R = {} kOhm , C = {} Hz'.format(formData['Vin'], formData['R'], formData['F']))
+        args['inputs'] = inputs
+        return render_template("output.html", args=args)
+    
+    if formData['title'] == "Positive-Clamper":
+        args = {}
+        args['list'] = circuitList
+        args['imgUrl'] = formData['imgUrl']
+        circuit, analysis, plot = positive_clamper(formData['Vin'], formData['R'], formData['C'], formData['F'])
+        args['title'] = circuit.title
+        buf = BytesIO()
+        plot.savefig(buf, format="png")
+        data = base64.b64encode(buf.getbuffer()).decode("ascii")
+        args['plot'] = data
+        inputs = str('Inputs: Vin = {} V , R = {} kOhm , C = {} mF , F = {} Hz'.format(formData['Vin'], formData['R'], formData['C'], formData['F']))
         args['inputs'] = inputs
         return render_template("output.html", args=args)
 
+    if formData['title'] == "Negative-Clamper":
+        args = {}
+        args['list'] = circuitList
+        args['imgUrl'] = formData['imgUrl']
+        circuit, analysis, plot = negative_clamper(formData['Vin'], formData['R'], formData['C'], formData['F'])
+        args['title'] = circuit.title
+        buf = BytesIO()
+        plot.savefig(buf, format="png")
+        data = base64.b64encode(buf.getbuffer()).decode("ascii")
+        args['plot'] = data
+        inputs = str('Inputs: Vin = {} V , R = {} kOhm , C = {} mF , F = {} Hz'.format(formData['Vin'], formData['R'], formData['C'], formData['F']))
+        args['inputs'] = inputs
+        return render_template("output.html", args=args)
 
     return render_template("output.html", args=args)    
 

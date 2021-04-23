@@ -340,3 +340,51 @@ def series_positive_clipper(v,r,f):
 
     return circuit, analysis, plt
 
+
+def positive_clamper(v,r,c,f):
+    print(v,r,c,f)
+    circuit = Circuit('Positive Clamper')
+    circuit.include('./app/circuits/libraries/diode/switching/1N4148.lib')
+    source = circuit.SinusoidalVoltageSource('input', 'in', circuit.gnd, amplitude= u_V(float(v)), frequency=u_Hz(float(f)))
+    circuit.C('C1', 'in','output', u_mF(float(c)))
+    circuit.X('D1','1N4148', circuit.gnd , 'output')
+    circuit.R('load', 'output', circuit.gnd, u_Ohm(float(r)))
+
+    simulator = circuit.simulator(temperature=25, nominal_temperature=25)
+    analysis = simulator.transient(step_time=source.period/200, end_time=source.period*2)
+
+    plt.title('Positive Clamper')
+    plt.xlabel('Time [s]')
+    plt.ylabel('Voltage [V]')
+    plt.grid()
+    plt.plot(analysis['in'])
+    plt.plot(analysis.output)
+    plt.legend(('input', 'output'), loc=(.05,.1))
+    
+    plt.tight_layout()
+
+    return circuit, analysis, plt
+
+def negative_clamper(v,r,c,f):
+    print(v,r,c,f)
+    circuit = Circuit('Negative Clamper')
+    circuit.include('./app/circuits/libraries/diode/switching/1N4148.lib')
+    source = circuit.SinusoidalVoltageSource('input', 'in', circuit.gnd, amplitude= u_V(float(v)), frequency=u_Hz(float(f)))
+    circuit.C('C1', 'in','output', u_mF(float(c)))
+    circuit.X('D1','1N4148', 'output' , circuit.gnd )
+    circuit.R('load', 'output', circuit.gnd, u_Ohm(float(r)))
+
+    simulator = circuit.simulator(temperature=25, nominal_temperature=25)
+    analysis = simulator.transient(step_time=source.period/200, end_time=source.period*2)
+
+    plt.title('Negative Clamper')
+    plt.xlabel('Time [s]')
+    plt.ylabel('Voltage [V]')
+    plt.grid()
+    plt.plot(analysis['in'])
+    plt.plot(analysis.output)
+    plt.legend(('input', 'output'), loc=(.05,.1))
+    
+    plt.tight_layout()
+
+    return circuit, analysis, plt
