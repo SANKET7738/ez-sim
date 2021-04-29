@@ -395,3 +395,30 @@ def negative_clamper(v,r,c,f):
     plt.tight_layout()
 
     return circuit, analysis, plt
+
+def nmos_characteristics(Vd, Vg):
+    circuit = Circuit('NMOS Transistor')
+    circuit.include('./app/circuits/libraries/transistor/ptm_65nm_nmos_bulk.mod')
+
+    # Define the DC supply voltage value
+    Vdd = float(Vd)
+
+    # Instanciate circuit elements
+    Vgate = circuit.V('gate', 'gatenode', circuit.gnd, u_V(float(Vg)))
+    Vdrain = circuit.V('drain', 'vdd', circuit.gnd, u_V(Vdd))
+    # M <name> <drain node> <gate node> <source node> <bulk/substrate node>
+    circuit.MOSFET(1, 'vdd', 'gatenode', circuit.gnd, circuit.gnd, model='ptm65nm_nmos')
+
+    simulator = circuit.simulator(temperature=25, nominal_temperature=25)
+    analysis = simulator.dc(Vdrain=slice(0, Vdd, .01))
+
+    figure, ax = plt.subplots(figsize=(20, 10))
+
+    ax.plot(analysis['vdd'], u_A(-analysis.Vdrain))
+    ax.legend('NMOS characteristic')
+    ax.grid()
+    ax.set_xlabel('Vds [V]')
+    ax.set_ylabel('Id [A]')
+
+
+    return circuit, analysis, plt

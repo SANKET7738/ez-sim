@@ -3,7 +3,7 @@ from flask import render_template, request, redirect, jsonify
 import numpy as np
 import base64
 from io import BytesIO
-from circuit import operational_amplifier, voltage_divider, current_divider, diode_characteristic_curve, half_wave_rectifier, full_wave_rectifier, low_pass_rc_filter, high_pass_rc_filter, series_negative_clipper, series_positive_clipper, positive_clamper, negative_clamper
+from circuit import operational_amplifier, voltage_divider, current_divider, diode_characteristic_curve, half_wave_rectifier, full_wave_rectifier, low_pass_rc_filter, high_pass_rc_filter, series_negative_clipper, series_positive_clipper, positive_clamper, negative_clamper, nmos_characteristics
 
 circuitList = { 
         "1": "Voltage-Divider",
@@ -17,6 +17,7 @@ circuitList = {
         "9" : "Series-Positive-Clipper",
         "10" : "Positive-Clamper",
         "11" : "Negative-Clamper",
+        "12" : "n-MOSFET-Characteristics",
     }
 circuitImgList = {
     "Voltage-Divider": "https://pyspice.fabrice-salvaire.fr/releases/v1.4/_images/voltage-divider.png",
@@ -30,6 +31,7 @@ circuitImgList = {
     "Series-Positive-Clipper" : "https://www.daenotes.com/sites/default/files/article-images/series-positive-clipper.GIF",
     "Positive-Clamper" : "https://www.tutorialspoint.com/electronic_circuits/images/positive_clamper_circuit.jpg",
     "Negative-Clamper" : "https://www.tutorialspoint.com/electronic_circuits/images/negative_clamper_circuit.jpg",
+    "n-MOSFET-Characteristics" : "http://www.physics.csbsju.edu/trace/i/nMOSFET.CC.gif",
 }
 
 inputList = {
@@ -44,6 +46,7 @@ inputList = {
     "Series-Positive-Clipper": [['Vin', 'R', 'F'], "Units: Vin = V , R = Ohm , F = Hz, Diode = '1N4148' "],
     "Positive-Clamper" :  [['Vin', 'R' , 'C', 'F'], "Units: Vin = V ,  R = Ohm , C = mF , F = Hz, Diode = '1N4148' " ],
     "Negative-Clamper" :  [['Vin', 'R' , 'C', 'F'], "Units: Vin = V ,  R = Ohm , C = mF , F = Hz, Diode = '1N4148' " ],
+    "n-MOSFET-Characteristics": [['Vd', 'Vg'], "Units: Vd = V , Vg = V "],
 }
 
 def renderInput(item):
@@ -116,9 +119,6 @@ def output():
         args['list'] = circuitList
         args['imgUrl'] = formData['imgUrl']
         circuit, analysis, plot = half_wave_rectifier(formData['Vin'], formData['R'], formData['C'], formData['F'])
-        print(circuit)
-        print(analysis)
-        print(plot)
         args['title'] = circuit.title
         buf = BytesIO()
         plot.savefig(buf, format="png")
@@ -226,6 +226,22 @@ def output():
         inputs = str('Inputs: Vin = {} V , R = {} kOhm , C = {} mF , F = {} Hz'.format(formData['Vin'], formData['R'], formData['C'], formData['F']))
         args['inputs'] = inputs
         return render_template("output.html", args=args)
+
+    
+    if formData['title'] == "n-MOSFET-Characteristics":
+        args = {}
+        args['list'] = circuitList
+        args['imgUrl'] = formData['imgUrl']
+        circuit, analysis, plot = nmos_characteristics(formData['Vd'], formData['Vg'])
+        args['title'] = circuit.title
+        buf = BytesIO()
+        plot.savefig(buf, format="png")
+        data = base64.b64encode(buf.getbuffer()).decode("ascii")
+        args['plot'] = data
+        inputs = str('Inputs: Vd = {} V , Vg = {} V'.format(formData['Vd'], formData['Vg']))
+        args['inputs'] = inputs
+        return render_template("output.html", args=args)
+
 
     return render_template("output.html", args=args)    
 
