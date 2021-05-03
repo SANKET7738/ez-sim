@@ -397,7 +397,7 @@ def negative_clamper(v,r,c,f):
     return circuit, analysis, plt
 
 def nmos_characteristics(Vd, Vg):
-    circuit = Circuit('NMOS Transistor')
+    circuit = Circuit('NMOS Input Characteristic')
     circuit.include('./app/circuits/libraries/transistor/ptm_65nm_nmos_bulk.mod')
 
     # Define the DC supply voltage value
